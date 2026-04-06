@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة الإدارة - أزياء الزفاف</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background: #f5efe8;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        h1 {
+            color: #c44536;
+        }
+
+        .store-link {
+            background: #c44536;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .admin-panel {
+            background: white;
+            border-radius: 32px;
+            padding: 2rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            color: #3a2a2a;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1.5px solid #eedbd6;
+            border-radius: 20px;
+            font-size: 1rem;
+            transition: 0.2s;
+            background: #fffaf8;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #c44536;
+            box-shadow: 0 0 0 3px rgba(196, 69, 54, 0.1);
+        }
+
+        .btn {
+            background: #c44536;
+            color: white;
+            border: none;
+            padding: 0.7rem 1.8rem;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-danger {
+            background: #a12a2a;
+        }
+
+        .product-list-admin {
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .admin-item {
+            background: #fef4f1;
+            padding: 1rem;
+            border-radius: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .empty-msg {
+            text-align: center;
+            padding: 3rem;
+            color: #aa8a7a;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #aa8a7a;
+        }
+
+        .success-msg {
+            background: #4caf50;
+            color: white;
+            padding: 0.8rem;
+            border-radius: 16px;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .error-msg {
+            background: #f44336;
+            color: white;
+            padding: 0.8rem;
+            border-radius: 16px;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>⚙️ لوحة إدارة المنتجات</h1>
+        <a href="index.html" class="store-link">🛍️ زيارة المتجر</a>
+    </div>
+
+    <div class="admin-panel">
+        <h2>➕ إضافة منتج جديد</h2>
+        <div id="message"></div>
+        <form id="productForm">
+            <div class="form-group">
+                <label>📷 اختر صورة من حاسوبك</label>
+                <input type="file" id="productImageFile" accept="image/*">
+            </div>
+            <div class="form-group" style="text-align:center;">
+                <label>🖼️ معاينة الصورة</label>
+                <img id="imagePreview" src="https://via.placeholder.com/180?text=معاينة" alt="معاينة" style="width:180px; height:180px; object-fit:cover; border-radius:20px; border:1px dashed #d3b8b1; margin-top:0.5rem;">
+            </div>
+            <div class="form-group">
+                <label>🏷️ القسم</label>
+                <select id="productCategory">
+                    <option value="فستان زفاف">فستان زفاف</option>
+                    <option value="بدلة عرسان">بدلة عرسان</option>
+                    <option value="فستان سهرة">فستان سهرة</option>
+                    <option value="طقم تقليدي">طقم تقليدي</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>📏 القياس</label>
+                <input type="text" id="productSize" placeholder="S / M / L أو قياس رقمي" >
+            </div>
+            <div class="form-group">
+                <label>💰 السعر (دولار)</label>
+                <input type="number" id="productPrice" placeholder="100" required>
+            </div>
+            <div class="form-group">
+                <label>🔢 كود المنتج (يُولد تلقائياً)</label>
+                <input type="text" id="productCode" readonly>
+            </div>
+            <!-- الحقول الأساسية أزيلت حسب الطلب -->
+            <div class="form-group">
+                <h3 style="margin-bottom:0.6rem;">🎨 تفاصيل فساتين السهرة</h3>
+                <label>🧵 الأقمشة</label>
+                <select id="dressFabrics" multiple size="4">
+                    <option>ساتان</option>
+                    <option>شيفون</option>
+                    <option>تول</option>
+                    <option>أورغانزا</option>
+                    <option>كريب</option>
+                    <option>مخمل</option>
+                    <option>دانتيل</option>
+                    <option>ترتر</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>🧭 الموديلات</label>
+                <select id="dressModels" multiple size="4">
+                    <option>إيه لاين</option><option>حورية البحر</option><option>ترامبت</option><option>مستقيم</option>
+                    <option>عمودي</option><option>منفوش ملكي</option><option>خصر إمباير</option><option>فيت آند فلير</option>
+                    <option>قصة أميرة</option><option>فستان لف</option><option>فستان انسيابي</option><option>هاي لو</option><option>قفطان سهرة</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>👗 الرقبات</label>
+                <select id="dressNecks" multiple size="4">
+                    <option>بدون أكتاف</option><option>قلب</option><option>فتحة V</option><option>أوف شولدر</option>
+                    <option>كتف واحد</option><option>هالتر</option><option>رقبة عالية</option><option>رقبة مربعة</option>
+                    <option>رقبة قارب</option><option>رقبة شفافة</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>🧥 الأكمام</label>
+                <select id="dressSleeves" multiple size="4">
+                    <option>بدون أكمام</option><option>أكمام كاب</option><option>أكمام قصيرة</option><option>أكمام طويلة</option>
+                    <option>أكمام شفافة</option><option>أكمام دانتيل</option><option>أكمام منفوشة</option><option>أكمام كاب طويلة</option>
+                    <option>أكمام جرس</option><option>أكمام أوف شولدر</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>🎀 تصاميم الظهر</label>
+                <select id="dressBack" multiple size="4">
+                    <option>ظهر مفتوح</option><option>ظهر V</option><option>ظهر دانتيل</option><option>ظهر شفاف</option>
+                    <option>ظهر بأزرار</option><option>ظهر كورسيه</option><option>ظهر فتحة مفتاح</option><option>ظهر منخفض</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>🩰 أشكال التنورة</label>
+                <select id="dressSkirt" multiple size="4">
+                    <option>تنورة مستقيمة</option><option>تنورة واسعة</option><option>تنورة طبقات</option><option>ذيل خلفي</option>
+                    <option>شق جانبي</option><option>تنورة بكسرات</option><option>تنورة بكشاكش</option><option>تنورة بطيات</option>
+                    <option>تنورة حورية</option><option>تنورة منفوشة</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>✨ الزخارف</label>
+                <select id="dressOrnaments" multiple size="4">
+                    <option>تطريز</option><option>خرز</option><option>كريستال</option><option>ترتر</option>
+                    <option>ريش</option><option>ورود ثلاثية الأبعاد</option><option>كورسيه</option><option>درابيه</option>
+                    <option>كشكشة</option><option>فيونكة</option><option>لؤلؤ</option><option>أبليك</option>
+                </select>
+            </div>
+            <button type="submit" class="btn">➕ إضافة المنتج</button>
+        </form>
+    </div>
+
+    <div class="admin-panel">
+        <h2>📋 قائمة المنتجات</h2>
+        <div id="adminProductsList" class="product-list-admin">
+            <div class="loading">⏳ جاري تحميل المنتجات...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Backendless configuration
+    const APP_DOMAIN = 'briefproduce-us.backendless.app';
+    const BACKENDLESS_APP_ID = '2E6F9C1A-A874-4B86-B85D-D4BE224CA436';
+    const BACKENDLESS_API_KEY = 'D9A7EA80-8140-4F9A-8AD6-45A3FF2369A1';
+    // IMPORTANT: Replace the above APP ID & API KEY with your own Backendless credentials
+
+    let selectedFile = null;
+    const productCodeInput = document.getElementById('productCode');
+
+    const productImageFileInput = document.getElementById('productImageFile');
+    const imagePreview = document.getElementById('imagePreview');
+    const multiSelectIds = [
+        'dressFabrics','dressModels','dressNecks','dressSleeves',
+        'dressBack','dressSkirt','dressOrnaments'
+    ];
+
+    function setPreview(src) {
+        imagePreview.src = src || 'https://via.placeholder.com/180?text=معاينة';
+    }
+
+    function handleFileSelection() {
+        const file = productImageFileInput?.files?.[0] || null;
+        selectedFile = file;
+        setPreview('');
+        if (!file) {
+            setPreview('');
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => setPreview(reader.result);
+        reader.readAsDataURL(file);
+    }
+
+    if (productImageFileInput) {
+        productImageFileInput.addEventListener('change', handleFileSelection);
+    }
+
+    function getSelectedValues(selectId) {
+        const el = document.getElementById(selectId);
+        if (!el) return [];
+        return Array.from(el.selectedOptions).map(o => o.value);
+    }
+
+    function generateCode() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let result = '';
+        for (let i = 0; i < 6; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+    }
+
+    function setNewCode() {
+        if (productCodeInput) {
+            productCodeInput.value = generateCode();
+        }
+    }
+
+    async function uploadImage(file) {
+        const timestamp = Date.now();
+        const safeFilename = `${timestamp}-${file.name}`;
+        const uploadPath = `admin-uploads/${encodeURIComponent(safeFilename)}`;
+        const endpoint = `https://${APP_DOMAIN}/api/files/${uploadPath}?overwrite=true`;
+        const formData = new FormData();
+        formData.append('upload', file);
+
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'application-id': BACKENDLESS_APP_ID,
+                'secret-key': BACKENDLESS_API_KEY
+            },
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error('فشل في رفع الصورة');
+        }
+
+        const payload = await response.json();
+        if (!payload.fileURL) {
+            throw new Error('لم يتم استرجاع رابط الصورة بعد الرفع');
+        }
+
+        return payload.fileURL;
+    }
+    const TABLE_NAME = 'Drees';
+    
+    let products = [];
+
+    function showMessage(text, isError = false) {
+        const msgDiv = document.getElementById('message');
+        msgDiv.innerHTML = `<div class="${isError ? 'error-msg' : 'success-msg'}">${text}</div>`;
+        setTimeout(() => {
+            msgDiv.innerHTML = '';
+        }, 3000);
+    }
+
+    async function fetchProducts() {
+        try {
+            const response = await fetch(`https://${APP_DOMAIN}/api/data/${TABLE_NAME}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'application-id': BACKENDLESS_APP_ID,
+                    'secret-key': BACKENDLESS_API_KEY
+                }
+            });
+            
+            if (!response.ok) throw new Error('فشل في جلب البيانات');
+            products = await response.json();
+            renderAdminList();
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('adminProductsList').innerHTML = `
+                <div class="empty-msg">
+                    ❌ خطأ في الاتصال بقاعدة البيانات<br>
+                    <small>يرجى التأكد من إعدادات Backendless (APP ID و API Key)</small>
+                </div>
+            `;
+        }
+    }
+
+    async function addProduct(productData) {
+        try {
+            const response = await fetch(`https://${APP_DOMAIN}/api/data/${TABLE_NAME}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'application-id': BACKENDLESS_APP_ID,
+                    'secret-key': BACKENDLESS_API_KEY
+                },
+                body: JSON.stringify({
+                    name: productData.name,
+                    image: productData.image,
+                    category: productData.category,
+                    price: Number(productData.price || 0),
+                    description: productData.description || "",
+                    size: productData.size || "",
+                    code: productData.code || "",
+                    fabricsList: productData.fabricsList || [],
+                    modelsList: productData.modelsList || [],
+                    neckList: productData.neckList || [],
+                    sleeveList: productData.sleeveList || [],
+                    backList: productData.backList || [],
+                    skirtList: productData.skirtList || [],
+                    ornamentList: productData.ornamentList || []
+                })
+            });
+            
+            if (!response.ok) throw new Error('فشل في إضافة المنتج');
+            const newProduct = await response.json();
+            showMessage('✅ تم إضافة المنتج بنجاح!');
+            fetchProducts(); // Refresh list
+            return newProduct;
+        } catch (error) {
+            console.error('Error:', error);
+            showMessage('❌ فشل في إضافة المنتج: ' + error.message, true);
+        }
+    }
+
+    async function deleteProduct(productId) {
+        if (!confirm("هل أنت متأكد من حذف هذا المنتج؟")) return;
+        
+        try {
+            const response = await fetch(`https://${APP_DOMAIN}/api/data/${TABLE_NAME}/${productId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'application-id': BACKENDLESS_APP_ID,
+                    'secret-key': BACKENDLESS_API_KEY
+                }
+            });
+            
+            if (!response.ok) throw new Error('فشل في حذف المنتج');
+            showMessage('🗑️ تم حذف المنتج بنجاح');
+            fetchProducts(); // Refresh list
+        } catch (error) {
+            console.error('Error:', error);
+            showMessage('❌ فشل في حذف المنتج: ' + error.message, true);
+        }
+    }
+
+    function renderAdminList() {
+        const adminContainer = document.getElementById('adminProductsList');
+        if (!products || products.length === 0) {
+            adminContainer.innerHTML = `<div class="empty-msg">📭 لا توجد منتجات، أضف منتجك الأول!</div>`;
+            return;
+        }
+        
+        adminContainer.innerHTML = products.map(product => `
+            <div class="admin-item">
+                <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                    <img src="${product.image || 'https://via.placeholder.com/55'}" width="55" height="55" style="border-radius: 16px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/55'">
+                    <div>
+                        <strong>${product.name || 'منتج'}</strong><br>
+                        <small>${product.category || 'غير مصنف'}${product.price ? ' | ' + product.price + ' دولار' : ''}</small><br>
+                        <small>كود: ${product.code || '-'}</small>
+                    </div>
+                </div>
+                <button class="btn btn-danger" data-id="${product.objectId}" style="padding: 0.4rem 1rem;">🗑️ حذف</button>
+            </div>
+        `).join('');
+        
+        // Attach delete events
+        document.querySelectorAll('[data-id]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const id = btn.getAttribute('data-id');
+                deleteProduct(id);
+            });
+        });
+    }
+
+    // Handle form submission
+    function setupForm() {
+        const form = document.getElementById('productForm');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!selectedFile) {
+                showMessage("⚠️ الرجاء اختيار صورة من جهازك", true);
+                return;
+            }
+
+            const category = document.getElementById('productCategory').value;
+            const price = document.getElementById('productPrice').value.trim();
+            const name = '';
+            const desc = '';
+            const size = document.getElementById('productSize').value.trim();
+            const code = productCodeInput ? productCodeInput.value.trim() : '';
+            const fabricsList = getSelectedValues('dressFabrics');
+            const modelsList = getSelectedValues('dressModels');
+            const neckList = getSelectedValues('dressNecks');
+            const sleeveList = getSelectedValues('dressSleeves');
+            const backList = getSelectedValues('dressBack');
+            const skirtList = getSelectedValues('dressSkirt');
+            const ornamentList = getSelectedValues('dressOrnaments');
+
+            if (!price) {
+                showMessage("⚠️ الرجاء إدخال السعر بالدولار", true);
+                return;
+            }
+
+            let imageUrl = '';
+            try {
+                imageUrl = await uploadImage(selectedFile);
+            } catch (uploadError) {
+                showMessage('❌ ' + uploadError.message, true);
+                return;
+            }
+
+            await addProduct({
+                image: imageUrl,
+                name: name || 'منتج',
+                category: category,
+                price: Number(price),
+                description: desc || "",
+                size: size,
+                code: code || generateCode(),
+                fabricsList: fabricsList.join(', '),
+                modelsList: modelsList.join(', '),
+                neckList: neckList.join(', '),
+                sleeveList: sleeveList.join(', '),
+                backList: backList.join(', '),
+                skirtList: skirtList.join(', '),
+                ornamentList: ornamentList.join(', ')
+            });
+
+            // Reset form
+            form.reset();
+            selectedFile = null;
+            setPreview('https://via.placeholder.com/180?text=معاينة');
+            if (productImageFileInput) {
+                productImageFileInput.value = '';
+            }
+            setNewCode();
+            // Clear multi-selects
+            multiSelectIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.selectedIndex = -1;
+            });
+        });
+    }
+    
+    // Initialize
+    setupForm();
+    setNewCode();
+    fetchProducts();
+</script>
+</body>
+</html>
