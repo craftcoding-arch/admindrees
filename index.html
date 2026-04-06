@@ -56,7 +56,14 @@
             <div class="row">
                 <div class="col">
                     <label>📏 القياس</label>
-                    <input type="text" id="productSize" placeholder="S / M / L أو قياس رقمي">
+                    <select id="productSize">
+                        <option value="XS">XS</option>
+                        <option value="S">S</option>
+                        <option value="M">M</option>
+                        <option value="L">L</option>
+                        <option value="XL">XL</option>
+                        <option value="XXL">XXL</option>
+                    </select>
                 </div>
                 <div class="col">
                     <label>💰 السعر (دولار)</label>
@@ -65,6 +72,16 @@
                 <div class="col">
                     <label>🔢 كود المنتج (تلقائي)</label>
                     <input type="text" id="productCode" readonly>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label>💵 سعر الأجرة (دولار)</label>
+                    <input type="number" id="productRent" placeholder="50">
+                </div>
+                <div class="col" style="flex:2 1 400px;">
+                    <label>📝 الوصف</label>
+                    <textarea id="productDesc" rows="3" placeholder="تفاصيل إضافية عن التصميم"></textarea>
                 </div>
             </div>
             <div class="form-group">
@@ -80,14 +97,6 @@
                     <option>إيه لاين</option><option>حورية البحر</option><option>ترامبت</option><option>مستقيم</option>
                     <option>عمودي</option><option>منفوش ملكي</option><option>خصر إمباير</option><option>فيت آند فلير</option>
                     <option>قصة أميرة</option><option>فستان لف</option><option>فستان انسيابي</option><option>هاي لو</option><option>قفطان سهرة</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>🩰 أشكال التنورة</label>
-                <select id="dressSkirt" multiple size="4">
-                    <option>تنورة مستقيمة</option><option>تنورة واسعة</option><option>تنورة طبقات</option><option>ذيل خلفي</option>
-                    <option>شق جانبي</option><option>تنورة بكسرات</option><option>تنورة بكشاكش</option><option>تنورة بطيات</option>
-                    <option>تنورة حورية</option><option>تنورة منفوشة</option>
                 </select>
             </div>
             <button type="submit" class="btn">إضافة المنتج</button>
@@ -116,7 +125,7 @@
     const imagePreviewFront = document.getElementById('imagePreviewFront');
     const imagePreviewBack = document.getElementById('imagePreviewBack');
 
-    const multiSelectIds = ['dressFabrics','dressModels','dressSkirt'];
+    const multiSelectIds = ['dressFabrics','dressModels'];
 
     function setPreview(target, src){
         target.src = src || 'https://via.placeholder.com/300';
@@ -280,11 +289,12 @@
             }
             const category=document.getElementById('productCategory').value;
             const price=document.getElementById('productPrice').value.trim();
-            const size=document.getElementById('productSize').value.trim();
+            const rent=document.getElementById('productRent').value.trim();
+            const size=document.getElementById('productSize').value;
+            const desc=document.getElementById('productDesc').value.trim();
             const code=productCodeInput?.value.trim() || '';
             const fabricsList=getSelectedValues('dressFabrics').join(', ');
             const modelsList=getSelectedValues('dressModels').join(', ');
-            const skirtList=getSelectedValues('dressSkirt').join(', ');
 
             if(!price){ showMessage('⚠️ الرجاء إدخال السعر',true); return; }
 
@@ -298,11 +308,12 @@
                     imageBack: backURL,
                     category,
                     price: Number(price),
+                    rent: rent ? Number(rent) : null,
                     size,
+                    description: desc,
                     code: code || generateCode(),
                     fabricsList,
-                    modelsList,
-                    skirtList
+                    modelsList
                 });
 
                 form.reset();
